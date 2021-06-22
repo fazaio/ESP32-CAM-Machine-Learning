@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+    <!-- Load the coco-ssd model. -->
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd"></script>
+</head>
+<style>
+    @font-face {
+        font-family: "Nunito";
+        src: url("Nunito-Regular.ttf")
+    }
+
+    html {
+        scroll-behavior: smooth
+    }
+
+    * {
+        box-sizing: border-box
+    }
+
+    aa a,
+    a:link,
+    a:visited,
+    a:hover,
+    a:active {
+        color: inherit;
+        text-decoration: none
+    }
+
+    p {
+        text-indent: 0px
+    }
+
+    body {
+        font-family: "Nunito", sans-serif;
+        background-color: #fff;
+        margin: 0px;
+        padding: 0px;
+        color: #555
+    }
+
+    table {
+        border: none;
+        width: 100%;
+        border-collapse: collapse;
+        border-top: 1px solid #e0e0e0
+    }
+
+    th {
+        border-bottom: 1px solid #e0e0e0;
+        padding: 10px 5px;
+        font-size: 14px;
+        background-color: #f2f2f2
+    }
+
+    td {
+        padding: 10px 5px;
+        border-bottom: 1px solid #e0e0e0;
+        font-size: 12px
+    }
+
+    .container {
+        position: relative;
+        width: 100%;
+        margin: 0 auto;
+        padding: 5px
+    }
+
+    .container-dash {
+        position: relative;
+        width: 99%;
+        display: grid;
+        grid-template-columns: 200px auto;
+        margin-top: 20px;
+        margin-left: auto;
+        margin-right: auto;
+        margin-bottom: 0px
+    }
+
+    .container-dash>div {
+        padding: 0px 5px
+    }
+
+    .container-dash>:nth-child(1) .card .body {
+        margin: 6px
+    }
+
+    .container-dash>:nth-child(1) .card .body li {
+        margin: 7px 0px;
+        padding: 0px 5px
+    }
+
+    .container-dash>:nth-child(1) .card .body ul {
+        list-style-type: none;
+        margin: 0;
+        padding: 0;
+        font-size: 14px
+    }
+
+    .container-dash>:nth-child(1) .card .body li:hover {
+        border-left: 1px solid #fe4066
+    }
+
+    nav {
+        padding: 12px 50px;
+        background-color: #fff;
+        overflow: auto;
+        margin: auto;
+        color: #888
+    }
+
+    .nav-left {
+        float: left
+    }
+
+    .nav-right {
+        float: right;
+        display: none;
+        font-size: 22px
+    }
+
+    .nav-left ul {
+        list-style-type: none;
+        margin: 0px;
+        padding: 0px;
+        display: inline-block
+    }
+
+    .nav-left li {
+        display: inline-block;
+        margin: 0px 2px;
+        padding: 1px 10px;
+        cursor: pointer;
+        letter-spacing: .1rem;
+        text-transform: uppercase;
+        text-decoration: none;
+        white-space: nowrap;
+        background-color: transparent;
+        font-size: 14px;
+        font-weight: 400
+    }
+
+    .nav-left .logo {
+        display: inline-block;
+        margin-right: 40px;
+        font-size: 22px;
+        font-weight: 400
+    }
+
+    nav ul a:hover {
+        border-bottom: 1px solid #fe4066
+    }
+
+    @media(min-width: 1281px) {
+        .container {
+            width: 70%
+        }
+
+        .container-dash {
+            width: 80%
+        }
+
+        .nav-left ul {
+            display: inline-block !important
+        }
+    }
+
+    @media(min-width: 1025px)and (max-width: 1280px) {
+        .container {
+            width: 75%
+        }
+
+        .container-dash {
+            width: 80%
+        }
+
+        .nav-left ul {
+            display: inline-block !important
+        }
+    }
+
+    @media(min-width: 768px)and (max-width: 1024px) {
+        .container {
+            width: 80%
+        }
+
+        .container-dash {
+            width: 85%
+        }
+
+        .nav-left ul {
+            display: inline-block !important
+        }
+    }
+
+    @media(min-width: 768px)and (max-width: 1024px)and (orientation: landscape) {
+        .container {
+            width: 80%
+        }
+
+        .container-dash {
+            width: 85%
+        }
+
+        .nav-left ul {
+            display: inline-block !important
+        }
+    }
+
+    @media(min-width: 481px)and (max-width: 767px) {
+        .container {
+            width: 90%
+        }
+
+        .container-dash {
+            width: 90%;
+            grid-template-columns: none;
+            display: block
+        }
+
+        .container-dash>:nth-child(1) {
+            display: block
+        }
+
+        .nav-left ul {
+            display: none
+        }
+
+        nav {
+            padding-left: 20px;
+            padding-right: 20px
+        }
+
+        .nav-left li {
+            display: block;
+            padding: 15px 10px
+        }
+
+        .nav-right {
+            display: block
+        }
+
+        .rsv {
+            display: block !important
+        }
+
+        .hide {
+            display: none !important
+        }
+    }
+
+    @media(min-width: 320px)and (max-width: 480px) {
+        .container {
+            width: 95%
+        }
+
+        .container-dash {
+            width: 95%;
+            grid-template-columns: none;
+            display: block
+        }
+
+        .container-dash>:nth-child(1) {
+            display: block
+        }
+
+        .nav-left ul {
+            display: none
+        }
+
+        nav {
+            padding-left: 20px;
+            padding-right: 20px
+        }
+
+        .nav-left li {
+            display: block;
+            padding: 15px 10px
+        }
+
+        .nav-right {
+            display: block
+        }
+
+        .rsv {
+            display: block !important
+        }
+
+        .hide {
+            display: none !important
+        }
+    }
+
+    .tgreen {
+        color: #8edf6b !important
+    }
+
+    .tyellow {
+        color: #f6db7b !important
+    }
+
+    .tred {
+        color: #fe4066 !important
+    }
+
+    .tblue {
+        color: #3baaf8 !important
+    }
+
+    .tgrays {
+        color: #e0e0e0 !important
+    }
+
+    .tgraym {
+        color: #888 !important
+    }
+
+    .tgrayl {
+        color: #555 !important
+    }
+
+    .twhite {
+        color: #fff !important
+    }
+
+    .bgreen {
+        background-color: #8edf6b !important
+    }
+
+    .byellow {
+        background-color: #f6db7b !important
+    }
+
+    .bred {
+        background-color: #fe4066 !important
+    }
+
+    .bblue {
+        background-color: #3baaf8 !important
+    }
+
+    .bgrays {
+        background-color: #e0e0e0 !important
+    }
+
+    .bgraym {
+        background-color: #888 !important
+    }
+
+    .bgrayl {
+        background-color: #555 !important
+    }
+
+    .bwhite {
+        background-color: #fff !important
+    }
+
+    .button,
+    button,
+    input {
+        margin: 2px;
+        color: #555;
+        display: inline-block;
+        padding: 10px 20px;
+        text-align: center;
+        font-size: 12px;
+        letter-spacing: .05rem;
+        text-decoration: none;
+        background-color: #fff;
+        border-radius: 4px;
+        border: 1px solid #bbb;
+        cursor: pointer;
+        box-sizing: border-box;
+        font-weight: 600;
+        font-family: "Nunito", sans-serif
+    }
+
+    .button:hover,
+    button:hover,
+    input:hover,
+    .button:focus,
+    button:focus,
+    input:focus {
+        color: #333;
+        border-color: #888;
+        outline: 0
+    }
+
+    input {
+        width: 100%;
+        padding: 5px;
+        margin: 1px;
+        box-sizing: border-box;
+        color: #888;
+        border-radius: 4px;
+        border: 1px solid #bbb;
+        text-align: left !important
+    }
+
+    .button-block {
+        display: block;
+        width: 100%
+    }
+
+    .card {
+        margin: 5px 0px;
+        padding: 20px 15px;
+        background-color: #fff;
+        border-radius: 2px
+    }
+
+    .card .head {
+        padding: 2px 0px;
+        font-size: 18px;
+        font-weight: bolder;
+        color: #333
+    }
+
+    .card .body {
+        padding: 1px;
+        font-size: 16px;
+        text-align: justify;
+        margin: 10px 8px
+    }
+
+    .border {
+        border: 1px solid #e0e0e0
+    }
+
+    .center {
+        text-align: center !important
+    }
+
+    .left {
+        text-align: left !important
+    }
+
+    .right {
+        text-align: right !important
+    }
+
+    .shadows {
+        box-shadow: 0 .125rem .25rem rgba(0, 0, 0, .075) !important
+    }
+
+    .mts {
+        margin-top: 1rem
+    }
+
+    .ms {
+        margin: 1rem
+    }
+
+    .mrs {
+        margin-right: 1rem
+    }
+
+    .mls {
+        margin-left: 1rem
+    }
+
+    .mbs {
+        margin-bottom: 1rem
+    }
+
+    .ps {
+        padding: .5rem
+    }
+
+    .f12 {
+        font-size: 12px
+    }
+
+    .f14 {
+        font-size: 14px
+    }
+
+    .f16 {
+        font-size: 16px
+    }
+
+    textarea {
+        border: 1px solid #e0e0e0;
+        border-radius: 5px;
+        width: 100%;
+        resize: none;
+        padding: 10px;
+        white-space: pre
+    }
+
+    .code {
+        height: auto;
+        max-width: 100%;
+        overflow-x: scroll;
+        white-space: nowrap;
+        border: 1px solid #e0e0e0;
+        padding: 25px 15px;
+        border-radius: 3px;
+        font-size: 12px;
+        margin: 10px 0px
+    }
+
+    .grid-two {
+        display: grid;
+        grid-template-columns: 50% 50%
+    }
+
+    .grid-three {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr
+    }
+
+    .grid-two>div {
+        padding: 5px
+    }
+
+    .grid-three>div {
+        padding: 5px
+    }
+
+    .size {
+        width: 800px;
+        height: auto;
+    }
+
+    /*# sourceMappingURL=minit.css.map */
+</style>
+
+<body>
+    <section>
+        <div class="container">
+            <div>
+                <h1>Object Detection</h1>
+                Powered By <span class="tred"><b>@fazaio</b></span>
+            </div>
+            <div style="margin-top: 50px;">
+                <div><b>Resolution :</b></div>
+                <div id="parent_btn">
+                    <button onclick="change_resolution('10')" id="f10" class="button">UXGA (1600px*1200px) </button>
+                    <button onclick="change_resolution('9')" id="f9" class="button">SXGA(1280x1024) </button>
+                    <button onclick="change_resolution('8')" id="f8" class="button">XGA(1024x768) </button>
+                    <button onclick="change_resolution('7')" id="f7" class="button">SVGA(800x600) </button>
+                    <button onclick="change_resolution('6')" id="f6" class="button">VGA(640x480) </button>
+                    <button onclick="change_resolution('5')" id="f5" class="button">CIF(400x296) </button>
+                    <button onclick="change_resolution('4')" id="f4" class="button">QVGA(320x240) </button>
+                    <button onclick="change_resolution('3')" id="f3" class="button">HQVGA(240x176) </button>
+                    <button onclick="change_resolution('0')" id="f0" class="button">QQVGA(160x120) </button>
+                </div>
+            </div>
+        </div>
+    </section>
+    <section class="container">
+        <div>
+            <div>
+                <div>input :</div>
+                <img class="size" id="img" alt="" />
+            </div>
+            <div>
+                <div>output :</div>
+                <canvas class="size" id="canvas"></canvas>
+            </div>
+        </div>
+    </section>
+</body>
+
+</html>
+<script>
+    const baseHost = document.location.origin
+    const stream_url = `${baseHost}:81/stream`
+    const stream_status_url = `${baseHost}/status`
+
+    const img = document.getElementById("img");
+    img.crossOrigin = "anonymous";
+img.src = stream_url
+
+    img.height = 588;
+    img.width = 800;
+
+    function stream_onload() {
+        return new Promise((resolve) => {
+            img.onload = resolve(1)
+            img.onerror = resolve(0)
+        })
+    }
+
+    function status() {
+        return new Promise((resolve) => {
+            fetch(stream_status_url)
+                .then(res => res.json())
+                .then(data => {
+                    resolve(data)
+                })
+        })
+    }
+
+    async function detect(model) {
+        const predic = await model.detect(img);
+        if(predic.length >= 1){
+            console.log(predic);
+        }
+        rendercanvas(predic);
+        requestAnimationFrame(() => {
+            detect(model);
+        });
+    }
+
+    function mobilenet() {
+        return new Promise((resolve) => {
+            console.log("start egine load model!");
+            cocoSsd.load("mobilenet_v2").then((model) => {
+                console.log("model loaded!");
+                resolve(model)
+            });
+        })
+    }
+
+    function change_resolution(x) {
+        const query = `${baseHost}/control?var=framesize&val=${x}`
+        fetch(query)
+            .then(response => {
+                console.log(`request to ${query} finished, status: ${response.status}`)
+            })
+    }
+
+    async function awal() {
+        const ready = await stream_onload()
+        const cam = await status()
+        const model = await mobilenet()
+        if (ready) {
+            console.log(cam);
+            detect(model)
+        }
+    }
+
+    function rendercanvas(predictions) {
+        const canvas = document.getElementById("canvas");
+        const ctx = canvas.getContext("2d");
+        // draw something on canvas
+        canvas.width = img.clientWidth;
+        canvas.height = img.clientHeight;
+        ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height); // Fonts
+        const font = "16px sans-serif";
+        ctx.font = font;
+        ctx.textBaseline = "top";
+        ctx.drawImage(img, 0, 0, img.width, img.height);
+        predictions.forEach((prediction) => {
+            const x = prediction.bbox[0];
+            const y = prediction.bbox[1];
+            const width = prediction.bbox[2];
+            const height = prediction.bbox[3]; // Bounding box
+            ctx.strokeStyle = "#00FFFF";
+            ctx.lineWidth = 2;
+            ctx.strokeRect(x, y, width, height); // Label background
+            ctx.fillStyle = "#00FFFF";
+            const textWidth = ctx.measureText(prediction.class).width;
+            const textHeight = parseInt(font, 10); // base 10
+            ctx.fillRect(x, y, textWidth + 4, textHeight + 4);
+        });
+        predictions.forEach((prediction) => {
+            const x = prediction.bbox[0];
+            const y = prediction.bbox[1];
+            ctx.fillStyle = "#000000";
+            ctx.fillText(prediction.class, x, y);
+        });
+    }
+
+    awal();
+</script>
