@@ -1,7 +1,7 @@
 # ESP32-CAM-Machine-Learning
 
 ## Introduction
-ESP32-CAM is board that support camera module & camera server, we can access the stream data from sensor using protocol 81, and i'm try to make esp32-cam more cool.
+ESP32-CAM is board that support camera module & camera server, we can access the stream data from sensor using port 81, and i'm try to make esp32-cam more cool.
 This repository contains code to implementation Machine Learning use framework TensorflowJs. let's make ESP32-CAM can detect an object, image processing and etc.
 
 <p align="center">
