@@ -570,7 +570,7 @@
 
 </html>
 <script>
-    const baseHost = document.location.origin
+    const baseHost = "http://172.20.10.7"
     const stream_url = `${baseHost}:81/stream`
     const stream_status_url = `${baseHost}/status`
 
@@ -657,7 +657,7 @@ img.src = stream_url
             ctx.lineWidth = 2;
             ctx.strokeRect(x, y, width, height); // Label background
             ctx.fillStyle = "#00FFFF";
-            const textWidth = ctx.measureText(prediction.class).width;
+            const textWidth = ctx.measureText(`${prediction.class}+${prediction.score}`).width;
             const textHeight = parseInt(font, 10); // base 10
             ctx.fillRect(x, y, textWidth + 4, textHeight + 4);
         });
@@ -665,7 +665,7 @@ img.src = stream_url
             const x = prediction.bbox[0];
             const y = prediction.bbox[1];
             ctx.fillStyle = "#000000";
-            ctx.fillText(prediction.class, x, y);
+            ctx.fillText(`${prediction.class}|${prediction.score}`, x, y);
         });
     }
 
