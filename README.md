@@ -25,3 +25,7 @@ Cooming Soon!
 
 ## Body Segmentation
 Cooming Soon!
+
+<br /><br /><br /><br />
+
+### Buy me coffee | [![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://paypal.me/fazaux?country.x=ID&locale.x=en_US)
